@@ -11,16 +11,22 @@ import datetime
 import os
 import shutil
 
+# -------------------------
+# Load environment variables
+# -------------------------
 load_dotenv()
+
 # -------------------------
 # Elastic connection setup
 # -------------------------
 ELASTIC_URL = "https://eda6f533d8524075abddae2a7527be04.us-central1.gcp.cloud.es.io:443"
 ELASTIC_INDEX = "fire_districts"
-ELASTIC_USER = "elastic"
-ELASTIC_PASS = os.getenv("ELASTIC_PASSWORD")  # <-- read from environment
+ELASTIC_API_KEY = os.getenv("ELASTIC_API_KEY")  # stored in .env or Streamlit secrets
 
-ELASTIC_AUTH = (ELASTIC_USER, ELASTIC_PASS)
+HEADERS = {
+    "Authorization": f"ApiKey {ELASTIC_API_KEY}",
+    "Content-Type": "application/json"
+}
 
 st.set_page_config(page_title="Fire Districts Tool", layout="wide")
 
@@ -84,7 +90,7 @@ with col2:
 
             r = requests.post(
                 f"{ELASTIC_URL}/{ELASTIC_INDEX}/_doc",
-                auth=ELASTIC_AUTH,
+                headers=HEADERS,
                 json=doc
             )
             if r.status_code in [200, 201]:
@@ -124,7 +130,7 @@ st.subheader("Saved Districts")
 
 r = requests.get(
     f"{ELASTIC_URL}/{ELASTIC_INDEX}/_search",
-    auth=ELASTIC_AUTH,
+    headers=HEADERS,
     json={"size": 1000, "_source": ["district_name", "created_at"]}
 )
 
@@ -158,7 +164,7 @@ if r.status_code == 200:
             doc_id = df.loc[df["district_name"] == district_to_delete, "id"].values[0]
             delete_res = requests.delete(
                 f"{ELASTIC_URL}/{ELASTIC_INDEX}/_doc/{doc_id}",
-                auth=ELASTIC_AUTH
+                headers=HEADERS
             )
             if delete_res.status_code == 200:
                 st.success(f"{district_to_delete} deleted from Elasticsearch")
