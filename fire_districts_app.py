@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from dotenv import load_dotenv
 from streamlit_folium import st_folium
 import folium
 from folium.plugins import Draw
@@ -8,20 +7,14 @@ import geopandas as gpd
 from shapely.geometry import shape
 import requests
 import datetime
-import os
 import shutil
-
-# -------------------------
-# Load environment variables
-# -------------------------
-load_dotenv()
 
 # -------------------------
 # Elastic connection setup
 # -------------------------
 ELASTIC_URL = "https://eda6f533d8524075abddae2a7527be04.us-central1.gcp.cloud.es.io:443"
 ELASTIC_INDEX = "fire_districts"
-ELASTIC_API_KEY = os.getenv("ELASTIC_API_KEY")  # stored in .env or Streamlit secrets
+ELASTIC_API_KEY = st.secrets["ELASTIC_API_KEY"]  # stored in Streamlit Cloud secrets
 
 HEADERS = {
     "Authorization": f"ApiKey {ELASTIC_API_KEY}",
