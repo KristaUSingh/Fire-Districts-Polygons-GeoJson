@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from dotenv import load_dotenv
 from streamlit_folium import st_folium
 import folium
 from folium.plugins import Draw
@@ -10,12 +11,16 @@ import datetime
 import os
 import shutil
 
+load_dotenv()
 # -------------------------
 # Elastic connection setup
 # -------------------------
 ELASTIC_URL = "https://eda6f533d8524075abddae2a7527be04.us-central1.gcp.cloud.es.io:443"
 ELASTIC_INDEX = "fire_districts"
-ELASTIC_AUTH = ("elastic", "6QgNmXIeruukFV4qCWrnpaoc")  # username, password
+ELASTIC_USER = "elastic"
+ELASTIC_PASS = os.getenv("ELASTIC_PASSWORD")  # <-- read from environment
+
+ELASTIC_AUTH = (ELASTIC_USER, ELASTIC_PASS)
 
 st.set_page_config(page_title="Fire Districts Tool", layout="wide")
 
